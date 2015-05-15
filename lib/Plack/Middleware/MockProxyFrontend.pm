@@ -8,7 +8,7 @@ package Plack::Middleware::MockProxyFrontend;
 
 use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw( host_acceptor http_server _ssl_context );
-use URI ();
+use URI::Split ();
 use IO::Socket::SSL ();
 
 sub new {
@@ -32,24 +32,27 @@ sub call {
 	my $self = shift;
 	my $env = shift;
 
-	my ( $uri, $scheme, $host, $port, $client_fh, $acceptor );
+	my ( $scheme, $auth, $path, $query, $client_fh );
 
 	if ( 'CONNECT' eq $env->{'REQUEST_METHOD'} ) {
 		$client_fh = $env->{'psgix.io'}
 			or return [ 405, [], ['CONNECT is not supported'] ];
-		( $host, $port ) =
-			lc( $env->{'REQUEST_URI'} ) =~ m{^(?:.+\@)?(.+?)(?::(\d+))?$};
+		$auth = $env->{'REQUEST_URI'};
+		$scheme = 'https';
 	}
 	else {
-		$uri = URI->new( $env->{'REQUEST_URI'} );
-		$scheme = $uri->scheme
-			or return [ 400, [], ['Not implemented CONNECT method'] ];
-		$host = lc $uri->host;
+		( $scheme, $auth, $path, $query ) = URI::Split::uri_split $env->{'REQUEST_URI'};
+		return [ 400, [], ['Not a proxy request'] ]
+			if not $scheme
+			or $scheme !~ /\Ahttps?\z/i;
 	}
 
+	my ( $host, $port ) = ( lc $auth ) =~ m{^(?:.+\@)?(.+?)(?::(\d+))?$};
+	$port //= 'https' eq lc $scheme ? 443 : 80;
+
+	my $acceptor = $self->host_acceptor;
 	return [ 403, [], ['Refused by MockProxyFrontend'] ]
-		if $acceptor = $self->host_acceptor
-		and not grep $acceptor->( $host ), $host;
+		if $acceptor and not grep $acceptor->( $host ), $host;
 
 	$client_fh
 		? sub {
@@ -62,7 +65,7 @@ sub call {
 			);
 
 			$self->http_server->handle_connection( {
-				'psgi.url_scheme' => 'https',
+				'psgi.url_scheme' => $scheme,
 				SERVER_NAME       => $host,
 				SERVER_PORT       => $port,
 				SCRIPT_NAME       => '',
@@ -88,9 +91,9 @@ sub call {
 			%$env,
 			'psgi.url_scheme' => $scheme,
 			HTTP_HOST         => $host,
-			SERVER_PORT       => $uri->port,
-			REQUEST_URI       => $uri->path_query,
-			PATH_INFO         => $uri->path =~ s!%([0-9]{2})!chr hex $1!rge,
+			SERVER_PORT       => $port,
+			REQUEST_URI       => ( join '?', $path, $query // () ),
+			PATH_INFO         => $path =~ s!%([0-9]{2})!chr hex $1!rge,
 		} );
 }
 
