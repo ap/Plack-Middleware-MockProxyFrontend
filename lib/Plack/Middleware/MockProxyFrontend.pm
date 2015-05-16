@@ -108,8 +108,8 @@ __END__
  
  builder {
      enable 'MockProxyFrontend',
-        SSL_key_file  => 'key.pem',
-        SSL_cert_file => 'cert.pem';
+         SSL_key_file  => 'key.pem',
+         SSL_cert_file => 'cert.pem';
      $app;
  };
 
@@ -143,7 +143,7 @@ If you do, you will probably want to pass C<SSL_key_file> and C<SSL_cert_file>.
 
 A function that will be called to decide whether to serve a request.
 If it returns false, the request will be refused, otherwise it will be served.
-The function will be passed with the lowecased hostname from the request,
+The function will be passed the (lowercased) hostname from the request,
 both as its sole argument and in C<$_>. E.g.:
 
  enable 'MockProxyFrontend',
