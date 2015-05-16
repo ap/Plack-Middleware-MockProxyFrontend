@@ -127,6 +127,17 @@ of going out to the internet. But the request will look to your application as
 though it was actually sent to that domain, and likewise the response will look
 to the browser as though it actually came from that domain.
 
+=head1 NOTE
+
+If you use L<plackup> to start your application, use C<--no-default-middleware>
+to prevent it wrapping L<Plack::Middleware::Lint> around this middleware. Lint
+reacts badly to a browser speaking the proxy protocol to it.
+
+Generally MockProxyFrontend ought to be the outermost middleware in your stack.
+Most other middlewares will work OK when confronted with the proxy protocol,
+but they are not really designed for it, so it is best to convert the request
+to a normal HTTP request as soon as possible.
+
 =head1 CONFIGURATION OPTIONS
 
 =over 4
