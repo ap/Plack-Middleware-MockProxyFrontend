@@ -116,16 +116,23 @@ __END__
 =head1 DESCRIPTION
 
 This middleware implements the HTTP proxy protocolE<hellip> without the proxy:
-it just passes the requests down to the wrapped PSGI application.
-This is useful during development of PSGI applications that do virtual hosting
-(i.e. that dispatch on hostname somewhere).
+it passes every request down to the wrapped PSGI application. Your application
+becomes the browser's entire internet: no matter which address you navigate to,
+the response comes from the wrapped PSGI application.
 
-After enabling this middleware, you can set C<localhost:5000> (or wherever your
-development server listening) as the proxy in your browser and navigate to e.g.
-C<https://some.example.com>, and that request will hit your application instead
-of going out to the internet. But the request will look to your application as
-though it was actually sent to that domain, and likewise the response will look
-to the browser as though it actually came from that domain.
+This is useful in the development of PSGI applications that do virtual hosting,
+i.e. dispatching on hostname. Instead of testing your application by going to
+C<http://localhost:5000/>, you go to C<https://example.com/> (or whatever your
+site is). Your application will see a request for C<https://example.com/>, not
+C<http://localhost:5000/>, e.g. when your framework generates absolute links.
+And then when the page loads, the browser will think it is showing you the real
+C<https://example.com/>, e.g. in the address bar.
+
+The way this works is that instead of typing C<http://localhost:5000/> into the
+browser's address bar to test your app (or wherever your development server is
+listening), you put C<localhost:5000> as the HTTP/HTTPS proxy in the browser's
+configuration. Then I<any> URL you navigate to will end up being served by your
+application, so e.g. absolute links to C<https://example.com/> will just work.
 
 =head1 NOTE
 
@@ -148,7 +155,8 @@ Configuration options for L<IO::Socket::SSL> that will be used to construct an
 SSL context.
 
 You don't need to pass any of these unless you need SSL support.
-If you do, you will probably want to pass C<SSL_key_file> and C<SSL_cert_file>.
+If you need it, C<SSL_key_file> and C<SSL_cert_file> are probably the options
+you are looking for.
 
 =item C<host_acceptor>
 
