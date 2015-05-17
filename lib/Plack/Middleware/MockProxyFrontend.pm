@@ -9,6 +9,7 @@ package Plack::Middleware::MockProxyFrontend;
 use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw( host_acceptor http_server _ssl_context );
 use URI::Split ();
+use Plack::Util ();
 use IO::Socket::SSL ();
 
 sub new {
