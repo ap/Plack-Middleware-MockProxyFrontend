@@ -43,9 +43,8 @@ sub call {
 	}
 	else {
 		( $scheme, $auth, $path, $query ) = URI::Split::uri_split $env->{'REQUEST_URI'};
-		return [ 400, [], ['Not a proxy request'] ]
-			if not $scheme
-			or $scheme !~ /\Ahttps?\z/i;
+		return [ 400, [], ['Not a proxy request'] ] if not $scheme;
+		return [ 400, [], ['Non-HTTP(S) requests are unsupported'] ] if $scheme !~ /\Ahttps?\z/i;
 	}
 
 	my ( $host, $port ) = ( lc $auth ) =~ m{^(?:.+\@)?(.+?)(?::(\d+))?$};
