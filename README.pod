@@ -67,6 +67,9 @@ You don't need to pass any of these unless you need SSL support.
 If you need it, C<SSL_key_file> and C<SSL_cert_file> are probably the options
 you are looking for.
 
+Note that SSL support requires a PSGI server that implements the C<psgix.io>
+extension.
+
 =item C<host_acceptor>
 
 A function that will be called to decide whether to serve a request.
