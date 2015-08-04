@@ -1,11 +1,8 @@
-use 5.014;
-use strict;
-use warnings;
+use 5.014; use warnings;
 
 package Plack::Middleware::MockProxyFrontend;
 
 # ABSTRACT: virtualhost-aware PSGI app developer tool
-
 use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw( host_acceptor http_server _ssl_context );
 use URI::Split ();
