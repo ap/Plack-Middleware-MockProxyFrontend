@@ -8,7 +8,7 @@ Plack::Middleware::MockProxyFrontend - virtualhost-aware PSGI app developer tool
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
