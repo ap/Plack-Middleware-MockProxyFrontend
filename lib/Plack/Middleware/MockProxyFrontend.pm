@@ -53,14 +53,23 @@ sub call {
 
 	$client_fh
 		? sub {
+			# lie to the client that we have connected to the destination
 			my $writer = shift->( [ 200, [] ] );
 
+			# client starts SSL handshake only after hearing that the connection succeeded
 			my $conn = IO::Socket::SSL->new_from_fd(
 				fileno $client_fh,
 				SSL_server    => 1,
 				SSL_reuse_ctx => $self->_ssl_context,
 			);
 
+			# the client thinks it is establishing an SSL connection with the destination
+			# if this fails, that failure is already communicated at the SSL layer
+			# the proxy server only sees opaque traffic, it has no idea what happened
+			# all it knows is that the connection has ended, so the request is simply over
+			$writer->close, return if not $conn;
+
+			# now act as the destination
 			$self->http_server->handle_connection( {
 				'psgi.url_scheme' => $scheme,
 				SERVER_NAME       => $host,
