@@ -10,7 +10,7 @@ requires 'Plack::Util::Accessor';
 requires 'URI::Split';
 
 on test => sub {
-	requires 'Test::More', '0.88';
+	requires 'Test::More';
 	requires 'strict';
 };
 
