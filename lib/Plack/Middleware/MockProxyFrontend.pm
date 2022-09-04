@@ -2,7 +2,7 @@ use 5.014; use warnings;
 
 package Plack::Middleware::MockProxyFrontend;
 
-# ABSTRACT: virtualhost-aware PSGI app developer tool
+our $VERSION = '0.003';
 
 BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 use Plack::Util::Accessor qw( host_acceptor http_server _ssl_context );
@@ -110,6 +110,12 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
+=head1 NAME
+
+Plack::Middleware::MockProxyFrontend - virtualhost-aware PSGI app developer tool
+
 =head1 SYNOPSIS
 
  # in app.psgi
@@ -210,3 +216,5 @@ Use at your own risk.
 
 Mind you, I am anything but opposed to fixing these problems E<ndash> I am just
 not losing sleep over them. Patches welcome and highly appreciated.
+
+=cut
