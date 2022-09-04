@@ -2,7 +2,7 @@ use 5.014; use warnings;
 
 package Plack::Middleware::MockProxyFrontend;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 BEGIN { require Plack::Middleware; our @ISA = 'Plack::Middleware' }
 use Plack::Util::Accessor qw( host_acceptor http_server _ssl_context );
