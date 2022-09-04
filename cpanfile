@@ -9,9 +9,4 @@ requires 'Plack::Util';
 requires 'Plack::Util::Accessor';
 requires 'URI::Split';
 
-on test => sub {
-	requires 'Test::More';
-	requires 'strict';
-};
-
 # vim: ft=perl
